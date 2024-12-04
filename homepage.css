@@ -1,0 +1,214 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9fdf9;
+    color: #333;
+    scroll-behavior: smooth;
+  }
+  
+  /* Header Styles */
+  header {
+    background-color: lightgoldenrodyellow;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+  }
+  
+  .logo-name-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center content horizontally */
+    gap: 20px;
+    padding: 10px 20px;
+  }
+  
+  .logo {
+    width: 60px;
+    height: 60px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .logo:hover {
+    transform: scale(1.1);
+  }
+  
+  .website-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: #4caf50;
+    transition: color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .website-name:hover {
+    color: #000;
+    transform: scale(1.1);
+  }
+  
+  /* Navigation Bar */
+  nav {
+    background-color: #e6ffe6;
+    text-align: center;
+    padding: 10px 0;
+  }
+  
+  nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center; /* Center the navigation items */
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  nav ul li a {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  nav ul li a:hover {
+    color: #fff;
+    background-color: #4caf50;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transform: scale(1.05);
+  }
+  
+  /* Hero Section */
+  .hero-section {
+    text-align: center;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #e6ffe6;
+    border: 2px dashed #baf0ba;
+    border-radius: 10px;
+    max-width: 90%;
+  }
+  
+  .default-image {
+    display: block; /* Ensure it's treated as a block-level element */
+    margin: 0 auto; /* Center the image */
+    max-width: 100%;
+    height: auto;
+    border: 2px solid #baf0ba;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+  }
+  
+  .default-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Info Section */
+  .info-container {
+    text-align: center;
+    background-color: #baf0ba;
+    margin: 20px auto;
+    padding: 30px;
+    max-width: 80%;
+    border-radius: 10px;
+    font-size: 22px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .info-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Footer */
+  footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Align items to the center */
+    align-items: center; /* Vertically align items */
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .footer-content .social-links {
+    display: flex;
+    flex-direction: row; /* Arrange items horizontally */
+    align-items: center; /* Vertically align */
+    gap: 20px; /* Add space between items */
+  }
+  
+  .footer-content .social-links a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #baf0ba;
+    text-decoration: none;
+    font-size: 20px;
+  }
+  
+  .footer-content .social-links img {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .footer-content .social-links a:hover {
+    text-decoration: underline;
+  }
+  
+  .footer-content .contact-info {
+    text-align: center;
+  }
+  
+  .footer-content .quick-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .footer-content .quick-links a {
+    color: #baf0ba;
+    text-decoration: none;
+    margin: 5px 0;
+  }
+  
+  .footer-content .quick-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Back to Top Button */
+  button#backToTop {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000;
+    display: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  button#backToTop:hover {
+    background-color: #3a8b41;
+    transform: scale(1.1);
+  }
+
+  .logo{
+    width: 100px;
+    height: 100px;
+  }

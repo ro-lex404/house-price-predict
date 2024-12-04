@@ -1,0 +1,180 @@
+/* General Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-color: white; /* White background */
+    height: 100%; /* Ensures body takes full height */
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #4caf50; /* Theme color */
+    padding: 15px 20px;
+    color: white;
+}
+
+.nav-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.logo:hover {
+    transform: scale(1.2); /* Increase the size of the logo by 20% */
+    color: #ffeb3b; /* Light yellow color on hover */
+}
+
+.nav-heading {
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: #f1f1f1; /* Light color for better readability */
+    margin: 0;
+}
+
+/* Main Container (ensures footer sticks to bottom) */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; /* Allows the content area to grow and push the footer down */
+    padding: 20px;
+    background: url('https://example.com/real-estate-image.jpg') no-repeat center center fixed; /* Real estate background image */
+    background-size: cover; /* Ensures image covers the whole area */
+}
+
+/* Content Section */
+.content {
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background for readability */
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+h2 {
+    color: #4caf50; /* Theme color */
+    margin-bottom: 15px;
+    font-size: 2rem;
+}
+
+h3 {
+    color: #4caf50; /* Theme color */
+    margin-top: 30px;
+    font-size: 1.6rem;
+}
+
+p {
+    line-height: 1.8;
+    text-align: justify;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #000; /* Black background */
+    color: white;
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    max-height: 200px;
+    width: 100%; /* Ensure footer takes full width */
+}
+
+/* Footer Content */
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Added gap between sections */
+    max-width: 1000px;
+    width: 100%; /* Make sure it fits well in the screen */
+}
+
+/* Social Links */
+.social-links {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.social-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem; /* Adjusted size */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-links img {
+    width: 20px; /* Smaller icons */
+    height: 20px;
+}
+
+/* Contact Info and Quick Links */
+.contact-info, .quick-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.contact-info p, .quick-links a {
+    color: white;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.quick-links a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-heading {
+        font-size: 1rem;
+    }
+
+    .content {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .footer-content {
+        flex-direction: column;
+    }
+
+    .social-links {
+        flex-direction: column;
+    }
+}
