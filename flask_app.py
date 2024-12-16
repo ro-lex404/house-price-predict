@@ -1,18 +1,23 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import joblib
+from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # More specific CORS configuration
+app = Flask(__name__, template_folder='templates')  # Ensure 'index.html' is in 'templates' folder
+CORS(app)
 
 # Load the trained model
 model = joblib.load("land_price_prediction_model.pkl")
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         data = request.json
+        print("Received data:", data)  # Log input data
         
         # Create DataFrame from input data
         input_data = pd.DataFrame({
@@ -23,43 +28,39 @@ def predict():
             "historical_trends": [float(data['historical_trends'])],
             "land_size": [float(data['land_size'])]
         })
-        
+        print("Input DataFrame for prediction:", input_data)  # Log DataFrame
+
         # Make prediction
         prediction = model.predict(input_data)
-        
+        print("Prediction result:", prediction)  # Log prediction result
+
         return jsonify({
             'predicted_price': float(prediction[0]),
             'success': True
         })
-    
     except Exception as e:
+        print("Error during prediction:", e)  # Log error
         return jsonify({
             'error': str(e),
             'success': False
-        }), 400  # Added proper error status code
+        })
 
 @app.route('/feature-importance', methods=['GET'])
-def get_feature_importance():
+def feature_importance():
     try:
         feature_importance = model.feature_importances_
-        features = ["location", "accessibility", "neighborhood_quality", 
-                   "zoning", "historical_trends", "land_size"]
+        features = ["location", "accessibility", "neighborhood_quality", "zoning", "historical_trends", "land_size"]
         
-        importance_dict = {
-            features[i]: float(feature_importance[i]) 
-            for i in range(len(features))
-        }
-        
+        importance_dict = {features[i]: float(feature_importance[i]) for i in range(len(features))}
         return jsonify({
             'feature_importance': importance_dict,
             'success': True
         })
-    
     except Exception as e:
         return jsonify({
             'error': str(e),
             'success': False
-        }), 400  # Added proper error status code
+        })
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)  # Explicitly set port
+    app.run(debug=True)

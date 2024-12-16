@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Price Predictor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Land Price Predictor</h1>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Form Section -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-6 text-gray-700">Enter Property Details</h2>
+                <form id="predictionForm" class="space-y-4">
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700">Location (0 = rural, 10 = city center):</label>
+                        <input type="range" id="location" name="location" min="0" max="10" step="0.1" class="w-full">
+                    </div>
+                    <div>
+                        <label for="accessibility" class="block text-sm font-medium text-gray-700">Accessibility (0 = poor, 10 = excellent):</label>
+                        <input type="range" id="accessibility" name="accessibility" min="0" max="10" step="0.1" class="w-full">
+                    </div>
+                    <div>
+                        <label for="neighborhood_quality" class="block text-sm font-medium text-gray-700">Neighborhood Quality (0 = low, 10 = high):</label>
+                        <input type="range" id="neighborhood_quality" name="neighborhood_quality" min="0" max="10" step="0.1" class="w-full">
+                    </div>
+                    <div>
+                        <label for="zoning" class="block text-sm font-medium text-gray-700">Zoning:</label>
+                        <select id="zoning" name="zoning" class="w-full border rounded-md">
+                            <option value="1">Residential</option>
+                            <option value="2">Commercial</option>
+                            <option value="3">Industrial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="historical_trends" class="block text-sm font-medium text-gray-700">Historical Trends ($/sqft) (200-500):</label>
+                        <input type="number" id="historical_trends" name="historical_trends" step="0.01" class="w-full border rounded-md">
+                    </div>
+                    <div>
+                        <label for="land_size" class="block text-sm font-medium text-gray-700">Land Size (sqft) (1000-10000):</label>
+                        <input type="number" id="land_size" name="land_size" step="1" class="w-full border rounded-md">
+                    </div>
+                    <button type="submit" class="w-full bg-green-300 text-white py-2 px-4 rounded-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                        Get Price Prediction
+                    </button>
+                </form>
+            </div>
+    
+            <!-- Chart Section -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-6 text-gray-700">Feature Importance</h2>
+                <canvas id="featureChart" height="200"></canvas>
+            </div>
+        </div>
+    
+        <!-- Map Section -->
+        <div id="map" class="rounded-lg shadow-lg mt-8"></div>
+        <!-- Add this div to display the predicted price -->
+        <div id="prediction-result" class="hidden">
+        <h2 class="text-xl font-semibold mb-2 text-gray-700">Predicted Price:</h2>
+        <p id="predicted-price" class="text-lg font-medium text-gray-600"></p>
+        </div>
+
+        <!-- Add this div to display any error messages -->
+        <div id="error-message" class="hidden">
+            <p class="text-lg font-medium text-red-600"></p>
+        </div>
+    </div>
+<script>    
+    let featureChart;
+    let map;
+    
+    // Initialize Leaflet Map
+    function initializeMap() {
+        map = L.map('map').setView([12.9716, 77.5946], 12); // Default view (e.g., Bengaluru)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    }
+    
+    // Add marker to map
+    function addMarkerToMap(latitude, longitude, price) {
+        const marker = new L.marker([latitude, longitude]).addTo(map);
+        marker.bindPopup(`<b>Predicted Price:</b> ₹${price.toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`).openPopup();
+    }
+    
+    // Fetch and display feature importance
+    async function loadFeatureImportance() {
+        try {
+            const response = await fetch('http://localhost:5000/feature-importance');
+            const data = await response.json();
+    
+            if (data.success) {
+                const importance = data.feature_importance;
+                const labels = Object.keys(importance).map(key =>
+                    key.split('_').map(word =>
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ')
+                );
+                const values = Object.values(importance);
+    
+                const ctx = document.getElementById('featureChart').getContext('2d');
+    
+                if (featureChart) {
+                    featureChart.destroy();
+                }
+    
+                featureChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Importance Score',
+                            data: values,
+                            backgroundColor: 'rgba(134, 239, 172, 1)',
+                            borderColor: 'rgba(134, 239, 172, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Importance Score'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            showError('Failed to load feature importance data');
+        }
+    }
+    
+    // Handle form submission
+    document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log("Form submission captured");
+    
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        console.log("Data prepared for submission:", data);
+    
+        const conversionRate = 84; // 1 USD = 84 INR
+    
+        try {
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            console.log("Response received from backend");
+    
+            const result = await response.json();
+            console.log("Result from backend:", result);
+    
+            if (result.success) {
+                const priceInRupees = result.predicted_price * conversionRate;
+                console.log("Converted Price (INR):", priceInRupees);
+    
+                // Use the same converted price everywhere
+                showPrediction(priceInRupees); 
+                hideError();
+                addMarkerToMap(12.9716, 77.5946, priceInRupees);  // Update with dynamic lat/lon if available
+            } else {
+                console.error("Backend Error:", result.error);  // Log error for debugging
+                showError(result.error || 'Failed to make prediction');
+            }
+    
+        } catch (error) {
+            console.error("Error connecting to the server:", error);
+            showError('Error connecting to the server');
+        }
+    });
+    
+    // Show prediction result
+    function showPrediction(priceInRupees) {
+        const predictionResult = document.getElementById('prediction-result');
+        const predictedPrice = document.getElementById('predicted-price');
+    
+        predictedPrice.textContent = `₹${priceInRupees.toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    
+        predictionResult.classList.remove('hidden');
+    }
+    
+    // Show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.querySelector('p').textContent = message;
+        errorDiv.classList.remove('hidden');
+        document.getElementById('prediction-result').classList.add('hidden');
+    }
+    
+    // Hide error message
+    function hideError() {
+        document.getElementById('error-message').classList.add('hidden');
+    }
+    
+    // Load feature importance chart and initialize map on page load
+    loadFeatureImportance();
+    initializeMap();
+</script>    
+</body>
+</html>

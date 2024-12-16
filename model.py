@@ -22,7 +22,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Step 3: Train XGBoost Regressor
 model = XGBRegressor(
-    n_estimators=100,
+    n_estimators=1000,
     learning_rate=0.1,
     max_depth=6,
     random_state=42
