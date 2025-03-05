@@ -1,13 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
+import numpy as np
 import joblib
 from flask_cors import CORS
 
-app = Flask(__name__, template_folder='templates')  # Ensure 'index.html' is in 'templates' folder
+app = Flask(__name__, template_folder='templates')
 CORS(app)
 
-# Load the trained model
-model = joblib.load("land_price_prediction_model.pkl")
+# Load model, scaler, and feature order
+model = joblib.load("improved_land_price_model.pkl")
+scaler = joblib.load("feature_scaler.pkl")
+FEATURE_ORDER = joblib.load("feature_order.pkl")
 
 @app.route('/')
 def home():
@@ -17,9 +20,8 @@ def home():
 def predict():
     try:
         data = request.json
-        print("Received data:", data)  # Log input data
         
-        # Create DataFrame from input data
+        # Create DataFrame with base features
         input_data = pd.DataFrame({
             "location": [float(data['location'])],
             "accessibility": [float(data['accessibility'])],
@@ -28,18 +30,27 @@ def predict():
             "historical_trends": [float(data['historical_trends'])],
             "land_size": [float(data['land_size'])]
         })
-        print("Input DataFrame for prediction:", input_data)  # Log DataFrame
-
+        
+        # Add engineered features
+        input_data['location_accessibility'] = input_data['location'] * input_data['accessibility']
+        input_data['neighborhood_zoning'] = input_data['neighborhood_quality'] * (input_data['zoning'] == 2)
+        input_data['log_land_size'] = np.log(input_data['land_size'])
+        
+        # Ensure correct feature order
+        input_data = input_data[FEATURE_ORDER]
+        
+        # Scale features
+        scaled_input = scaler.transform(input_data)
+        
         # Make prediction
-        prediction = model.predict(input_data)
-        print("Prediction result:", prediction)  # Log prediction result
-
+        prediction = model.predict(scaled_input)
+        
         return jsonify({
             'predicted_price': float(prediction[0]),
             'success': True
         })
     except Exception as e:
-        print("Error during prediction:", e)  # Log error
+        print("Error during prediction:", e)
         return jsonify({
             'error': str(e),
             'success': False
@@ -49,9 +60,8 @@ def predict():
 def feature_importance():
     try:
         feature_importance = model.feature_importances_
-        features = ["location", "accessibility", "neighborhood_quality", "zoning", "historical_trends", "land_size"]
-        
-        importance_dict = {features[i]: float(feature_importance[i]) for i in range(len(features))}
+        importance_dict = {FEATURE_ORDER[i]: float(feature_importance[i]) 
+                         for i in range(len(FEATURE_ORDER))}
         return jsonify({
             'feature_importance': importance_dict,
             'success': True
