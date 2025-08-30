@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
+import numpy as np
 import joblib
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
@@ -8,8 +9,10 @@ from flask_cors import CORS
 app = Flask(__name__, template_folder='templates')
 CORS(app)
 
-# Load the trained model
-model = joblib.load("land_price_prediction_model.pkl")
+# Load model, scaler, and feature order
+model = joblib.load("improved_land_price_model.pkl")
+scaler = joblib.load("feature_scaler.pkl")
+FEATURE_ORDER = joblib.load("feature_order.pkl")
 
 # -----------------------
 # Load dataset for metrics
